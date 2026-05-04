@@ -1,0 +1,148 @@
+Table Asociado [headercolor: #175e7a] {
+	idAsociado integer [ pk, increment, not null, unique ]
+	nombre nvarchar(255) [ not null ]
+	ruc varchar(255) [ not null ]
+	"nombreDueño" varchar(255) [ not null ]
+	"apellidoDueño" varchar(255) [ not null ]
+	id_NivelSuscripcion integer [ not null ]
+	activo bit [ not null ]
+	fechaCreacion datetime [ not null ]
+}
+
+Table NivelSuscripcion [headercolor: #175e7a] {
+	idNivel integer [ pk, increment, not null, unique ]
+	nombre nvarchar(255) [ not null ]
+	cantidadUsuario integer [ not null ]
+	precioMensual decimal [ not null ]
+	precioAnual decimal [ not null ]
+	estado bit [ not null ]
+	fechaCreacion datetime [ not null ]
+
+	indexes {
+		() [ name: 'TipoSuscripcion_index_0' ]
+	}
+}
+
+Table EmpleadoAsociado [headercolor: #175e7a] {
+	idEmpleadoAsociado integer [ pk, increment, not null, unique ]
+	id_Asociados integer [ not null ]
+	nombre nvarchar(255) [ not null ]
+	"contraseña" nvarchar(255) [ not null ]
+	nombreEmpleado varchar(255) [ not null ]
+	apellidoPaterno varchar(255) [ not null ]
+	ApellidoMaterno varchar(255) [ not null ]
+	nroDocumento varchar(255) [ not null ]
+	fechaNacimiento datetime [ not null ]
+	id_TipoDocumento integer [ not null ]
+	id_Asociado integer [ not null ]
+	id_RolesClinica integer [ not null ]
+}
+
+Table TipoDocumento [headercolor: #175e7a] {
+	idTipoDocumento integer [ pk, increment, not null, unique ]
+	descripcion varchar(255) [ not null ]
+	estado bit [ not null ]
+	id_Asociado integer [ not null ]
+}
+
+Table Permiso [headercolor: #175e7a] {
+	idPermiso integer [ pk, increment, not null, unique ]
+	nombrePermiso varchar(255) [ not null ]
+	descripcionPermiso nvarchar(255) [ not null ]
+	id_Asociado integer [ not null ]
+}
+
+Table RolesClinica [headercolor: #175e7a] {
+	idRoles integer [ pk, increment, not null, unique ]
+	nombreRol varchar(255) [ not null ]
+	fechaCreacion datetime [ not null ]
+	estado bit [ not null ]
+	id_Asociado integer [ not null ]
+}
+
+Table Rol_Permiso [headercolor: #175e7a] {
+	id_Rol_Permiso integer [ pk, increment, not null, unique ]
+	id_RolesClinica integer [ not null ]
+	id_Permiso integer [ not null ]
+	id_Asociado integer [ not null ]
+}
+
+Table "Dueño" [headercolor: #175e7a] {
+	"idDueño" integer [ pk, increment, not null, unique ]
+	id_TipoDocumento integer [ not null ]
+	id_Asociado integer [ not null ]
+	nombre varchar(100) [ not null ]
+	apellidoPaterno varchar(100) [ not null ]
+	apellidoMaterno varchar(100) [ not null ]
+	nroDocumento varchar(20) [ not null ]
+	nroTelefono varchar(20)
+	correoElectronico nvarchar(100)
+	fechaCreacion datetime [ not null ]
+	fechaModificacion datetime
+	fechaEliminacion datetime [ not null ]
+	estado bit [ not null, default: 1 ]
+}
+
+Table "Dueño_Mascota" [headercolor: #175e7a] {
+	"idDueñoMascota" integer [ pk, increment, not null, unique ]
+	"id_Dueño" integer
+	id_Mascota integer
+	id_Asociado integer
+}
+
+Table Mascota [headercolor: #175e7a] {
+	idMascota integer [ pk, increment, not null, unique ]
+	nombre varchar(255)
+}
+
+Ref fk_Asociado_idAsociado_EmpleadoAsociado {
+	Asociado.idAsociado < EmpleadoAsociado.id_Asociados [ delete: no action, update: no action ]
+}
+
+Ref fk_Asociado_id_NivelSuscripcion_NivelSuscripcion {
+	Asociado.id_NivelSuscripcion > NivelSuscripcion.idNivel [ delete: no action, update: no action ]
+}
+
+Ref fk_EmpleadoAsociado_id_TipoDocumento_TipoDocumento {
+	EmpleadoAsociado.id_TipoDocumento > TipoDocumento.idTipoDocumento [ delete: no action, update: no action ]
+}
+
+Ref fk_Permiso_id_Asociado_Asociado {
+	Permiso.id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+}
+
+Ref fk_RolesClinica_id_Asociado_Asociado {
+	RolesClinica.id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+}
+
+Ref fk_Rol_Permiso_id_Asociado_Asociado {
+	Rol_Permiso.id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+}
+
+Ref fk_RolesClinica_idRoles_Rol_Permiso {
+	RolesClinica.idRoles < Rol_Permiso.id_RolesClinica [ delete: no action, update: no action ]
+}
+
+Ref fk_Permiso_idPermiso_Rol_Permiso {
+	Permiso.idPermiso > Rol_Permiso.id_Permiso [ delete: no action, update: no action ]
+}
+
+Ref "fk_Dueño_id_TipoDocumento_TipoDocumento" {
+	"Dueño".id_TipoDocumento > TipoDocumento.idTipoDocumento [ delete: no action, update: no action ]
+}
+
+Ref "fk_Dueño_id_Asociado_Asociado" {
+	"Dueño".id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+}
+
+Ref "fk_Dueño_Mascota_id_Dueño_Dueño" {
+	"Dueño_Mascota"."id_Dueño" > "Dueño"."idDueño" [ delete: no action, update: no action ]
+}
+
+Ref "fk_Dueño_Mascota_id_Asociado_Asociado" {
+	"Dueño_Mascota".id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+}
+
+Ref "fk_Mascota_idMascota_Dueño_Mascota" {
+	Mascota.idMascota > "Dueño_Mascota".id_Mascota [ delete: no action, update: no action ]
+}
