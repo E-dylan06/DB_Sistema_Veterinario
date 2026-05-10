@@ -1,148 +1,240 @@
-Table Asociado [headercolor: #175e7a] {
-	idAsociado integer [ pk, increment, not null, unique ]
-	nombre nvarchar(255) [ not null ]
-	ruc varchar(255) [ not null ]
-	"nombreDueño" varchar(255) [ not null ]
-	"apellidoDueño" varchar(255) [ not null ]
-	id_NivelSuscripcion integer [ not null ]
-	activo bit [ not null ]
-	fechaCreacion datetime [ not null ]
+Table "dbo"." DocumentoIdentidd" {
+  "idDocumentoIdentidad" int [pk, not null]
+  "descripcion" varchar(255) [not null]
+  "estado" bit [not null]
+  "id_Asociado" int [not null]
 }
 
-Table NivelSuscripcion [headercolor: #175e7a] {
-	idNivel integer [ pk, increment, not null, unique ]
-	nombre nvarchar(255) [ not null ]
-	cantidadUsuario integer [ not null ]
-	precioMensual decimal [ not null ]
-	precioAnual decimal [ not null ]
-	estado bit [ not null ]
-	fechaCreacion datetime [ not null ]
-
-	indexes {
-		() [ name: 'TipoSuscripcion_index_0' ]
-	}
+Table "dbo"."Dueno" {
+  "idDueno" int [pk, not null]
+  "id_DocumentoIdentidad" int [not null, ref: > "dbo"." DocumentoIdentidd"."idDocumentoIdentidad"]
+  "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
+  "nombre" varchar(100) [not null]
+  "apellidoPaterno" varchar(100) [not null]
+  "apellidoMaterno" varchar(100) [not null]
+  "nroDocumento" varchar(20) [not null]
+  "nroTelefono" varchar(20)
+  "correoElectronico" nvarchar(100)
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime [not null]
+  "estado" bit [not null, default: 1]
 }
 
-Table EmpleadoAsociado [headercolor: #175e7a] {
-	idEmpleadoAsociado integer [ pk, increment, not null, unique ]
-	id_Asociados integer [ not null ]
-	nombre nvarchar(255) [ not null ]
-	"contraseña" nvarchar(255) [ not null ]
-	nombreEmpleado varchar(255) [ not null ]
-	apellidoPaterno varchar(255) [ not null ]
-	ApellidoMaterno varchar(255) [ not null ]
-	nroDocumento varchar(255) [ not null ]
-	fechaNacimiento datetime [ not null ]
-	id_TipoDocumento integer [ not null ]
-	id_Asociado integer [ not null ]
-	id_RolesClinica integer [ not null ]
+Table "dbo"."Mascota" {
+  "idMascota" int [pk, not null, ref: > "dbo"."Dueno_Mascota"."id_Mascota"]
+  "nombre" varchar(255)
+  "id_Especie" int [ref: > "dbo"."EspecieRaza"."id"]
+  "id_Raza" int [ref: > "dbo"."EspecieRaza"."id_Especie"]
 }
 
-Table TipoDocumento [headercolor: #175e7a] {
-	idTipoDocumento integer [ pk, increment, not null, unique ]
-	descripcion varchar(255) [ not null ]
-	estado bit [ not null ]
-	id_Asociado integer [ not null ]
+Table "dbo"."Asociado" {
+  "idAsociado" int [pk, not null]
+  "nombre" nvarchar(255) [not null]
+  "ruc" varchar(255) [not null]
+  "nombreDueno" varchar(255) [not null]
+  "apellidoDueno" varchar(255) [not null]
+  "id_NivelSuscripcion" int [not null, ref: > "dbo"."NivelSuscripcion"."idNivel"]
+  "activo" bit [not null]
+  "fechaCreacion" datetime [not null]
 }
 
-Table Permiso [headercolor: #175e7a] {
-	idPermiso integer [ pk, increment, not null, unique ]
-	nombrePermiso varchar(255) [ not null ]
-	descripcionPermiso nvarchar(255) [ not null ]
-	id_Asociado integer [ not null ]
+Table "dbo"."EmpleadoAsociado" {
+  "idEmpleadoAsociado" int [pk, not null]
+  "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
+  "usuario" nvarchar(255) [not null]
+  "contrasena" nvarchar(255) [not null]
+  "nombreEmpleado" varchar(255) [not null]
+  "apellidoPaterno" varchar(255) [not null]
+  "ApellidoMaterno" varchar(255) [not null]
+  "nroDocumento" varchar(255) [not null]
+  "fechaNacimiento" datetime [not null]
+  "id_DocumentoIdentidad" int [not null, ref: > "dbo"." DocumentoIdentidd"."idDocumentoIdentidad"]
+  "id_Asociado_2" int [not null]
+  "id_RolesClinica" int [not null]
 }
 
-Table RolesClinica [headercolor: #175e7a] {
-	idRoles integer [ pk, increment, not null, unique ]
-	nombreRol varchar(255) [ not null ]
-	fechaCreacion datetime [ not null ]
-	estado bit [ not null ]
-	id_Asociado integer [ not null ]
+Table "dbo"."Servicio" {
+  "idsSevicio" int [pk, not null]
+  "nombreServicio" varchar(255) [not null]
+  "codigo" nvarchar(255) [not null]
+  "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
 }
 
-Table Rol_Permiso [headercolor: #175e7a] {
-	id_Rol_Permiso integer [ pk, increment, not null, unique ]
-	id_RolesClinica integer [ not null ]
-	id_Permiso integer [ not null ]
-	id_Asociado integer [ not null ]
+Table "dbo"."Dueno_Mascota" {
+  "idDuenoMascota" int [pk, not null]
+  "id_Dueno" int [ref: > "dbo"."Dueno"."idDueno"]
+  "id_Mascota" int
+  "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
 }
 
-Table "Dueño" [headercolor: #175e7a] {
-	"idDueño" integer [ pk, increment, not null, unique ]
-	id_TipoDocumento integer [ not null ]
-	id_Asociado integer [ not null ]
-	nombre varchar(100) [ not null ]
-	apellidoPaterno varchar(100) [ not null ]
-	apellidoMaterno varchar(100) [ not null ]
-	nroDocumento varchar(20) [ not null ]
-	nroTelefono varchar(20)
-	correoElectronico nvarchar(100)
-	fechaCreacion datetime [ not null ]
-	fechaModificacion datetime
-	fechaEliminacion datetime [ not null ]
-	estado bit [ not null, default: 1 ]
+Table "dbo"."Permiso" {
+  "idPermiso" int [pk, not null, ref: > "dbo"."Rol_Permiso"."id_Permiso"]
+  "nombrePermiso" varchar(255) [not null]
+  "descripcionPermiso" nvarchar(255) [not null]
+  "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
 }
 
-Table "Dueño_Mascota" [headercolor: #175e7a] {
-	"idDueñoMascota" integer [ pk, increment, not null, unique ]
-	"id_Dueño" integer
-	id_Mascota integer
-	id_Asociado integer
+Table "dbo"."Rol_Permiso" {
+  "id_Rol_Permiso" int [pk, not null]
+  "id_RolesClinica" int [not null, ref: > "dbo"."RolesClinica"."idRoles"]
+  "id_Permiso" int [not null]
+  "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
 }
 
-Table Mascota [headercolor: #175e7a] {
-	idMascota integer [ pk, increment, not null, unique ]
-	nombre varchar(255)
+Table "dbo"."RolesClinica" {
+  "idRoles" int [pk, not null]
+  "nombreRol" varchar(255) [not null]
+  "fechaCreacion" datetime [not null]
+  "estado" bit [not null]
+  "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
 }
 
-Ref fk_Asociado_idAsociado_EmpleadoAsociado {
-	Asociado.idAsociado < EmpleadoAsociado.id_Asociados [ delete: no action, update: no action ]
+Table "dbo"."NivelSuscripcion" {
+  "idNivel" int [pk, not null]
+  "nombre" nvarchar(255) [not null]
+  "cantidadUsuario" int [not null]
+  "precioMensual" decimal [not null]
+  "precioAnual" decimal [not null]
+  "estado" bit [not null]
+  "fechaCreacion" datetime [not null]
 }
 
-Ref fk_Asociado_id_NivelSuscripcion_NivelSuscripcion {
-	Asociado.id_NivelSuscripcion > NivelSuscripcion.idNivel [ delete: no action, update: no action ]
+Table "dbo"."Turno" {
+  "idTurno" int [pk, not null]
+  "nombre" bigint [not null]
+  "horaInicio" time [not null]
+  "horaFin" time [not null]
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+  "estado" bit [not null]
+  "id_Asocido" int [not null]
 }
 
-Ref fk_EmpleadoAsociado_id_TipoDocumento_TipoDocumento {
-	EmpleadoAsociado.id_TipoDocumento > TipoDocumento.idTipoDocumento [ delete: no action, update: no action ]
+Table "dbo"."EspecieRaza" {
+  "id" int [pk, not null]
+  "nombre" varchar(500) [not null]
+  "id_Especie" int
+  "estado" bit [not null]
+  "fechaCreacion" datetime
+  "fechaModificacion" datetime [not null]
+  "fechaEliminacion" datetime [not null]
+  "id_Asociado" bigint
 }
 
-Ref fk_Permiso_id_Asociado_Asociado {
-	Permiso.id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+Table "dbo"."Programacion" {
+  "idProgramacion" int [pk, not null]
+  "fecha" date [not null]
+  "id_EmpleadoAsociado" int [not null, ref: > "dbo"."EmpleadoAsociado"."idEmpleadoAsociado"]
+  "id_Turno" int [not null, ref: > "dbo"."Turno"."idTurno"]
+  "id_EmpleadoRegistrador" int [not null, ref: > "dbo"."EmpleadoAsociado"."idEmpleadoAsociado"]
+  "id_EstadoProgramacion" int [not null, ref: > "dbo"."EstadoProgramacion"."idEstadoProgramacion"]
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+  "id_asociado" int [not null]
+  "id_Servicio" int [not null, ref: > "dbo"."Servicio"."idsSevicio"]
 }
 
-Ref fk_RolesClinica_id_Asociado_Asociado {
-	RolesClinica.id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+Table "dbo"."CitaProgramada" {
+  "idCitaProgramada" int [pk, not null, ref: - "dbo"."Triaje"."id_CitaProgramada", ref: - "dbo"."Atencion"."id_CitaProgramada"]
+  "id_Dueño" int [not null, ref: > "dbo"."Dueno"."idDueno"]
+  "id_Programacion" int [not null, ref: > "dbo"."Programacion"."idProgramacion"]
+  "id_Mascota" int [not null, ref: > "dbo"."Mascota"."idMascota"]
+  "fecha" date [not null]
+  "horaFin" time
+  "id_EstadoCita" int [not null, ref: > "dbo"."EstadoCita"."idEstadoCita"]
+  "motivo" varchar(500) [not null]
+  "id_Asociado" int
+  "horaInicio" time [not null]
+  "id_ClaseCita" int [not null, ref: > "dbo"."ClaseCita"."idClaseCita"]
 }
 
-Ref fk_Rol_Permiso_id_Asociado_Asociado {
-	Rol_Permiso.id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+Table "dbo"."EstadoProgramacion" {
+  "idEstadoProgramacion" int [pk, not null]
+  "nombre" varchar(500) [not null]
+  "descripcion" varchar(500) [not null]
+  "id_Asociado" int [not null]
+  "estado" bit
 }
 
-Ref fk_RolesClinica_idRoles_Rol_Permiso {
-	RolesClinica.idRoles < Rol_Permiso.id_RolesClinica [ delete: no action, update: no action ]
+Table "dbo"."EstadoCita" {
+  "idEstadoCita" int [pk, not null]
+  "nombre" varchar(500) [not null]
+  "descripcion" nvarchar(500)
 }
 
-Ref fk_Permiso_idPermiso_Rol_Permiso {
-	Permiso.idPermiso > Rol_Permiso.id_Permiso [ delete: no action, update: no action ]
+Table "dbo"."Atencion" {
+  "idAtencion" int [pk, not null]
+  "id_CitaProgramada" int [unique]
+  "id_Triaje" int [unique]
+  "id_EmpleadoAsociado" int [not null]
+  "id_Asociado" int [not null]
+  "fechaAtencion" date [not null]
+  "horaInicio" time [not null]
+  "horaFin" time
+  "motivoConsulta" varchar(500) [not null]
+  "observacion" varchar(500) [not null]
+  "id_EstadoSalida" int [not null]
 }
 
-Ref "fk_Dueño_id_TipoDocumento_TipoDocumento" {
-	"Dueño".id_TipoDocumento > TipoDocumento.idTipoDocumento [ delete: no action, update: no action ]
+Table "dbo"."Receta" {
+  "id" bigint [pk, not null]
 }
 
-Ref "fk_Dueño_id_Asociado_Asociado" {
-	"Dueño".id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+Table "dbo"."RecetaDetalle" {
+  "id" bigint [pk, not null]
 }
 
-Ref "fk_Dueño_Mascota_id_Dueño_Dueño" {
-	"Dueño_Mascota"."id_Dueño" > "Dueño"."idDueño" [ delete: no action, update: no action ]
+Table "dbo"."VacunaAplicada" {
+  "id" bigint [pk, not null]
 }
 
-Ref "fk_Dueño_Mascota_id_Asociado_Asociado" {
-	"Dueño_Mascota".id_Asociado > Asociado.idAsociado [ delete: no action, update: no action ]
+Table "dbo"."Examen" {
+  "id" bigint [pk, not null]
 }
 
-Ref "fk_Mascota_idMascota_Dueño_Mascota" {
-	Mascota.idMascota > "Dueño_Mascota".id_Mascota [ delete: no action, update: no action ]
+Table "dbo"."EstadoSalidaAtencion" {
+  "idEstadoSalida" int [pk, not null]
+  "nombre" varchar(500)
+  "descripcion" nvarchar(500)
+}
+
+Table "dbo"."Triaje" {
+  "idTriaje" int [pk, not null, ref: - "dbo"."TriajeDetalle"."id_Triaje", ref: - "dbo"."Atencion"."id_Triaje"]
+  "id_CitaProgramada" int
+  "codigoTemporal" varchar(500)
+  "id_Mascota" int
+  "prioridad" int
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+  "id_Asociado" int [not null]
+  "id_EmpleadoAsociado" int [not null]
+  "id_MetodoIngreso" int
+}
+
+Table "dbo"."ClaseCita" {
+  "idClaseCita" int [pk, not null]
+  "nombre" varchar(500) [not null]
+  "descripcion" varchar(500) [not null]
+  "id_Asociado" int
+}
+
+Table "dbo"."TriajeDetalle" {
+  "idTriajeDetlle" int [pk, not null]
+  "temperatura" decimal
+  "peso" decimal
+  "Observaciones" varchar(500)
+  "alergias" nvarchar(500)
+  "id_Triaje" int
+}
+
+Table "dbo"."MetodoIngreso" {
+  "idMetodoIngreso" int [pk, not null, ref: - "dbo"."Triaje"."id_MetodoIngreso"]
+  "nombre" varchar(500)
+  "descripcion" varchar(500)
+  "id_Asociado" int
+  "estado" bit
 }
