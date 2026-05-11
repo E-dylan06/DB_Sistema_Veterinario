@@ -54,10 +54,10 @@ Table "dbo"."EmpleadoAsociado" {
   "id_RolesClinica" int [not null]
 }
 
-Table "dbo"."Servicio" {
-  "idsSevicio" int [pk, not null]
-  "nombreServicio" varchar(255) [not null]
-  "codigo" nvarchar(255) [not null]
+Table "dbo"."CategoriaServicio" {
+  "idCategoriaServicio" int [pk, not null]
+  "nombre" varchar(255) [not null]
+  "id_Categoria" int
   "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
 }
 
@@ -134,7 +134,8 @@ Table "dbo"."Programacion" {
   "fechaModificacion" datetime
   "fechaEliminacion" datetime
   "id_asociado" int [not null]
-  "id_Servicio" int [not null, ref: > "dbo"."Servicio"."idsSevicio"]
+  "id_Categoria" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
+  "id_Servicio" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
 }
 
 Table "dbo"."CitaProgramada" {
@@ -148,7 +149,8 @@ Table "dbo"."CitaProgramada" {
   "motivo" varchar(500) [not null]
   "id_Asociado" int
   "horaInicio" time [not null]
-  "id_ClaseCita" int [not null, ref: > "dbo"."ClaseCita"."idClaseCita"]
+  "id_Categoria" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
+  "id_Servicio" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
 }
 
 Table "dbo"."EstadoProgramacion" {
@@ -165,26 +167,26 @@ Table "dbo"."EstadoCita" {
   "descripcion" nvarchar(500)
 }
 
-Table "dbo"."Atencion" {
-  "idAtencion" int [pk, not null]
-  "id_CitaProgramada" int [unique]
-  "id_Triaje" int [unique]
-  "id_EmpleadoAsociado" int [not null]
-  "id_Asociado" int [not null]
-  "fechaAtencion" date [not null]
-  "horaInicio" time [not null]
-  "horaFin" time
-  "motivoConsulta" varchar(500) [not null]
-  "observacion" varchar(500) [not null]
-  "id_EstadoSalida" int [not null]
-}
-
 Table "dbo"."Receta" {
-  "id" bigint [pk, not null]
+  "idReceta" int [pk, not null]
+  "id_Consulta" int [not null, ref: - "dbo"."AtencionConsulta"."idConsulta"]
+  "fechaReceta" datetime [not null]
+  "id_EmpladoAsociado" int [not null]
+  "id_Asociado" int [not null]
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
 }
 
 Table "dbo"."RecetaDetalle" {
-  "id" bigint [pk, not null]
+  "idRecetDetalle" int [pk, not null]
+  "id_Receta" int [not null, ref: > "dbo"."Receta"."idReceta"]
+  "id_Medicamentos" int [not null]
+  "dosis" varchar(500) [not null]
+  "frecuencia" varchar(500) [not null]
+  "duracion" varchar(500) [not null]
+  "viaAdministracion" int [not null]
+  "indicacionesEspecificas" nvarchar(500)
 }
 
 Table "dbo"."VacunaAplicada" {
@@ -196,7 +198,7 @@ Table "dbo"."Examen" {
 }
 
 Table "dbo"."EstadoSalidaAtencion" {
-  "idEstadoSalida" int [pk, not null]
+  "idEstadoSalida" int [pk, not null, ref: - "dbo"."Atencion"."id_EstadoSalida"]
   "nombre" varchar(500)
   "descripcion" nvarchar(500)
 }
@@ -212,14 +214,7 @@ Table "dbo"."Triaje" {
   "fechaEliminacion" datetime
   "id_Asociado" int [not null]
   "id_EmpleadoAsociado" int [not null]
-  "id_MetodoIngreso" int
-}
-
-Table "dbo"."ClaseCita" {
-  "idClaseCita" int [pk, not null]
-  "nombre" varchar(500) [not null]
-  "descripcion" varchar(500) [not null]
-  "id_Asociado" int
+  "id_MetodoIngreso" int [ref: > "dbo"."MetodoIngreso"."idMetodoIngreso"]
 }
 
 Table "dbo"."TriajeDetalle" {
@@ -232,9 +227,107 @@ Table "dbo"."TriajeDetalle" {
 }
 
 Table "dbo"."MetodoIngreso" {
-  "idMetodoIngreso" int [pk, not null, ref: - "dbo"."Triaje"."id_MetodoIngreso"]
+  "idMetodoIngreso" int [pk, not null]
   "nombre" varchar(500)
   "descripcion" varchar(500)
   "id_Asociado" int
   "estado" bit
+}
+
+Table "dbo"."AtencionConsulta" {
+  "idConsulta" int [pk, not null, ref: - "dbo"."Anamnesis"."Id_Consulta", ref: - "dbo"."Consulta_Diagnostico"."id_Consulta"]
+  "id_Atencion" int [not null]
+  "evaluacionClinica" nvarchar(500) [not null]
+  "pronostico" nvarchar(500)
+  "tratamiento" nvarchar(500) [not null]
+  "indicaciones" nvarchar(500) [not null]
+  "Observaciones" nvarchar(500) [not null]
+  "requiereControl" bit [not null]
+  "fechaProximoControl" date [not null]
+  "fechCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+  "motivoConsulta" varchar(500) [not null]
+  "id_NivelRiesgo" int [not null, ref: > "dbo"."NivelRiesgo"."idNivelRiesgo"]
+}
+
+Table "dbo"."AtencionEstetica" {
+  "idEstetica" int [pk, not null]
+  "id_Atencion" int
+}
+
+Table "dbo"."Atencion" {
+  "idAtencion" int [pk, not null, ref: - "dbo"."AtencionConsulta"."id_Atencion", ref: - "dbo"."AtencionEstetica"."id_Atencion", ref: - "dbo"."AtencionVacunacion"."id_Atencion"]
+  "id_CitaProgramada" int [unique]
+  "id_Triaje" int [unique]
+  "id_EmpleadoAsociado" int [not null]
+  "id_Asociado" int [not null]
+  "fechaAtencion" date [not null]
+  "horaInicio" time [not null]
+  "horaFin" time
+  "observacion" varchar(500) [not null]
+  "id_EstadoSalida" int [not null]
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+}
+
+Table "dbo"."AtencionVacunacion" {
+  "idVacunacion" int [pk, not null]
+  "id_Atencion" int [not null]
+}
+
+Table "dbo"."Anamnesis" {
+  "idAnamnesis" int [pk, not null]
+  "Id_Consulta" int [not null]
+  "antecedentes" nvarchar(500)
+  "alergias" int [not null]
+  "cirugiasAnteriores" int [not null]
+  "medicamentosActuales" nvarchar(500)
+  "alimentacion" nvarchar(500)
+  "comportamiento" nvarchar(500)
+  "inicioSintomas" nvarchar(500)
+  "evolucionSintomas" nvarchar(500)
+  "observaciones" nvarchar(500)
+  "detalleAlergias" nvarchar(500)
+  "detalleCirugias" nvarchar(500)
+  "historialVacunacion" nvarchar(500)
+  "estiloVida" nvarchar(500)
+  "historilReproductivo" int [not null]
+  "reproduccionDetalle" nvarchar(500)
+}
+
+Table "dbo"."Confirmaciones" {
+  "idConfirmacion" int [pk, not null, ref: - "dbo"."Anamnesis"."cirugiasAnteriores", ref: - "dbo"."Anamnesis"."alergias", ref: - "dbo"."Anamnesis"."historilReproductivo"]
+  "descripcion" nvarchar(500) [not null]
+}
+
+Table "dbo"."NivelRiesgo" {
+  "idNivelRiesgo" int [pk, not null]
+  "nombre" varchar(500)
+  "descripcion" varchar(500)
+  "codigo" varchar(500)
+}
+
+Table "dbo"."MedicamentoCatalogo" {
+  "idMedicamento" int [pk, not null, ref: - "dbo"."RecetaDetalle"."id_Medicamentos"]
+  "codigoMedicamento" nvarchar(500) [not null]
+  "nombreMedicamento" nvarchar(500) [not null]
+  "descripcion" nvarchar(500) [not null]
+  "concentracion" nvarchar(500) [not null]
+  "presentacion" varchar(500) [not null]
+  "estado" bit [not null]
+}
+
+Table "dbo"."Consulta_Diagnostico" {
+  "idDiagnostico" int [pk, not null]
+  "id_Consulta" int [not null]
+  "id_DiagnosticoCatalogo" int [not null]
+}
+
+Table "dbo"."DiagnosticoCatalogo" {
+  "idDiagnosticoCatalogo" int [pk, not null, ref: > "dbo"."Consulta_Diagnostico"."id_DiagnosticoCatalogo"]
+  "codigoDiagnostico" nvarchar(500) [not null]
+  "nombreDiagnostico" nvarchar(500) [not null]
+  "descripcion" nvarchar(500) [not null]
 }
