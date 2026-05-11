@@ -24,7 +24,7 @@ Table "dbo"."Dueno" {
 Table "dbo"."Mascota" {
   "idMascota" int [pk, not null, ref: > "dbo"."Dueno_Mascota"."id_Mascota"]
   "nombre" varchar(255)
-  "id_Especie" int [ref: > "dbo"."EspecieRaza"."id"]
+  "id_Especie" int [ref: > "dbo"."EspecieRaza"."idEspecieRaza"]
   "id_Raza" int [ref: > "dbo"."EspecieRaza"."id_Especie"]
 }
 
@@ -59,6 +59,7 @@ Table "dbo"."CategoriaServicio" {
   "nombre" varchar(255) [not null]
   "id_Categoria" int
   "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
+  "precio" decimal
 }
 
 Table "dbo"."Dueno_Mascota" {
@@ -73,6 +74,7 @@ Table "dbo"."Permiso" {
   "nombrePermiso" varchar(255) [not null]
   "descripcionPermiso" nvarchar(255) [not null]
   "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
+  "id_NivelSuscripcion" int [not null]
 }
 
 Table "dbo"."Rol_Permiso" {
@@ -113,7 +115,7 @@ Table "dbo"."Turno" {
 }
 
 Table "dbo"."EspecieRaza" {
-  "id" int [pk, not null]
+  "idEspecieRaza" int [pk, not null]
   "nombre" varchar(500) [not null]
   "id_Especie" int
   "estado" bit [not null]
@@ -189,14 +191,6 @@ Table "dbo"."RecetaDetalle" {
   "indicacionesEspecificas" nvarchar(500)
 }
 
-Table "dbo"."VacunaAplicada" {
-  "id" bigint [pk, not null]
-}
-
-Table "dbo"."Examen" {
-  "id" bigint [pk, not null]
-}
-
 Table "dbo"."EstadoSalidaAtencion" {
   "idEstadoSalida" int [pk, not null, ref: - "dbo"."Atencion"."id_EstadoSalida"]
   "nombre" varchar(500)
@@ -253,7 +247,15 @@ Table "dbo"."AtencionConsulta" {
 
 Table "dbo"."AtencionEstetica" {
   "idEstetica" int [pk, not null]
-  "id_Atencion" int
+  "id_Atencion" int [not null]
+  "id_Servicio" int [not null]
+  "detalleServicio" nvarchar(500) [not null]
+  "Observaciones" nvarchar(500)
+  "id_Asociado" int [not null]
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+  "estado" bit [not null]
 }
 
 Table "dbo"."Atencion" {
@@ -270,11 +272,21 @@ Table "dbo"."Atencion" {
   "fechaCreacion" datetime [not null]
   "fechaModificacion" datetime
   "fechaEliminacion" datetime
+  "id_EstadoAtencion" int [not null, ref: > "dbo"."EstadoAtencion"."idEstadoAtencion"]
 }
 
 Table "dbo"."AtencionVacunacion" {
   "idVacunacion" int [pk, not null]
   "id_Atencion" int [not null]
+  "id_Vacuna" int [not null]
+  "dosis" bigint [not null]
+  "fechaAplicacion" date [not null]
+  "fechaRefuerzo" date [not null]
+  "Observaciones" bigint
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+  "estado" bit [not null]
 }
 
 Table "dbo"."Anamnesis" {
@@ -330,4 +342,9 @@ Table "dbo"."DiagnosticoCatalogo" {
   "codigoDiagnostico" nvarchar(500) [not null]
   "nombreDiagnostico" nvarchar(500) [not null]
   "descripcion" nvarchar(500) [not null]
+}
+
+Table "dbo"."EstadoAtencion" {
+  "idEstadoAtencion" int [pk, not null]
+  "nombre" varchar(500) [not null]
 }
