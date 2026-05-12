@@ -54,12 +54,17 @@ Table "dbo"."EmpleadoAsociado" {
   "id_RolesClinica" int [not null]
 }
 
-Table "dbo"."CategoriaServicio" {
-  "idCategoriaServicio" int [pk, not null]
+Table "dbo"."Servicio" {
+  "idServicio" int [pk, not null]
   "nombre" varchar(255) [not null]
-  "id_Categoria" int
+  "id_Categoria" int [ref: - "dbo"."ServicioCategoria"."idCategoriaServicio"]
   "id_Asociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
-  "precio" decimal
+  "precio" decimal [not null]
+  "requiereTriaje" bit [not null]
+  "estado" bit [not null]
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
 }
 
 Table "dbo"."Dueno_Mascota" {
@@ -136,8 +141,8 @@ Table "dbo"."Programacion" {
   "fechaModificacion" datetime
   "fechaEliminacion" datetime
   "id_asociado" int [not null]
-  "id_Categoria" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
-  "id_Servicio" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
+  "id_Categoria" int [not null, ref: > "dbo"."Servicio"."idServicio"]
+  "id_Servicio" int [not null, ref: > "dbo"."Servicio"."idServicio"]
 }
 
 Table "dbo"."CitaProgramada" {
@@ -151,8 +156,8 @@ Table "dbo"."CitaProgramada" {
   "motivo" varchar(500) [not null]
   "id_Asociado" int
   "horaInicio" time [not null]
-  "id_Categoria" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
-  "id_Servicio" int [not null, ref: > "dbo"."CategoriaServicio"."idCategoriaServicio"]
+  "id_Categoria" int [not null, ref: > "dbo"."Servicio"."idServicio"]
+  "id_Servicio" int [not null, ref: > "dbo"."Servicio"."idServicio"]
 }
 
 Table "dbo"."EstadoProgramacion" {
@@ -373,6 +378,7 @@ Table "dbo"."Producto" {
   "id_Presentacion_2" int [ref: > "dbo"."Presentacion"."idPresentacion"]
   "cantidadMinima" int [not null]
   "id_EmpleadoAsociado" int [not null]
+  "requiereInventario" bit [not null]
 }
 
 Table "dbo"."CategoriaProducto" {
@@ -416,4 +422,42 @@ Table "dbo"."ClaseMovimineto" {
 Table "dbo"."MotivoMovimiento" {
   "idMotivoMovimineto" int [pk, not null]
   "descripcion" int [not null]
+}
+
+Table "dbo"."Venta" {
+  "idVenta" int [pk, not null]
+  "codigoVenta" nvarchar(500) [not null]
+  "id_Atencion" int
+  "id_Cita" int
+  "fechaVenta" datetime
+  "subTotal" decimal
+  "descuento" decimal
+  "igv" decimal
+  "total" decimal
+  "montoPagado" decimal
+  "estadoVenta" int
+  "saldoPendiente" decimal
+  "metodoPago" int
+  "id_EmpleadoAsociado" date
+  "id_Asociado" int
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaEliminacion" varchar(500)
+}
+
+Table "dbo"."ServicioCategoria" {
+  "idCategoriaServicio" int [pk, not null]
+  "nombreCategoria" varchar(500) [not null]
+  "id_Asociado" int [not null]
+  "estado" bit [not null]
+}
+
+Table "dbo"."VentaDetalle" {
+  "idVentaDetalle" int [pk, not null]
+  "id_Venta" int [not null, ref: > "dbo"."Venta"."idVenta"]
+  "id_Producto" int [ref: > "dbo"."MoviminetoProducto"."id_Producto"]
+  "id_Servicio" int [ref: > "dbo"."Servicio"."idServicio"]
+  "cantidad" int [not null]
+  "precioUnitario" bigint
+  "subtotal" bigint
 }
