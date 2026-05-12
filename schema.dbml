@@ -142,7 +142,7 @@ Table "dbo"."Programacion" {
 
 Table "dbo"."CitaProgramada" {
   "idCitaProgramada" int [pk, not null, ref: - "dbo"."Triaje"."id_CitaProgramada", ref: - "dbo"."Atencion"."id_CitaProgramada"]
-  "id_Dueño" int [not null, ref: > "dbo"."Dueno"."idDueno"]
+  "id_Dueno" int [not null, ref: > "dbo"."Dueno"."idDueno"]
   "id_Programacion" int [not null, ref: > "dbo"."Programacion"."idProgramacion"]
   "id_Mascota" int [not null, ref: > "dbo"."Mascota"."idMascota"]
   "fecha" date [not null]
@@ -259,7 +259,7 @@ Table "dbo"."AtencionEstetica" {
 }
 
 Table "dbo"."Atencion" {
-  "idAtencion" int [pk, not null, ref: - "dbo"."AtencionConsulta"."id_Atencion", ref: - "dbo"."AtencionEstetica"."id_Atencion", ref: - "dbo"."AtencionVacunacion"."id_Atencion"]
+  "idAtencion" int [pk, not null, ref: - "dbo"."AtencionConsulta"."id_Atencion", ref: - "dbo"."AtencionEstetica"."id_Atencion"]
   "id_CitaProgramada" int [unique]
   "id_Triaje" int [unique]
   "id_EmpleadoAsociado" int [not null]
@@ -277,7 +277,7 @@ Table "dbo"."Atencion" {
 
 Table "dbo"."AtencionVacunacion" {
   "idVacunacion" int [pk, not null]
-  "id_Atencion" int [not null]
+  "id_Atencion" int [ref: > "dbo"."Atencion"."idAtencion"]
   "id_Vacuna" int [not null]
   "dosis" bigint [not null]
   "fechaAplicacion" date [not null]
@@ -287,6 +287,7 @@ Table "dbo"."AtencionVacunacion" {
   "fechaModificacion" datetime
   "fechaEliminacion" datetime
   "estado" bit [not null]
+  "id_Consulta" int [ref: > "dbo"."AtencionConsulta"."idConsulta"]
 }
 
 Table "dbo"."Anamnesis" {
@@ -347,4 +348,72 @@ Table "dbo"."DiagnosticoCatalogo" {
 Table "dbo"."EstadoAtencion" {
   "idEstadoAtencion" int [pk, not null]
   "nombre" varchar(500) [not null]
+}
+
+Table "dbo"."Producto" {
+  "idProducto" int [pk, not null]
+  "nombre" varchar(500) [not null]
+  "id_Categoria" int [not null, ref: > "dbo"."CategoriaProducto"."idCategoriaProducto"]
+  "id_Presentacion" int [not null]
+  "fechaFabricacion" date [not null]
+  "fechaVencimiento" date [not null]
+  "lote" varchar(500) [not null]
+  "fechaCreacion" datetime [not null]
+  "fechaModificacion" datetime
+  "fechaElimacion" datetime
+  "estado" bit [not null]
+  "cantidadIngreso" int [not null]
+  "id_Aociado" int [not null, ref: > "dbo"."Asociado"."idAsociado"]
+  "precioCompra" decimal [not null]
+  "lote_2" varchar(500)
+  "concentracion" varchar(500)
+  "precioVenta" decimal [not null]
+  "requiereReceta" bit [not null]
+  "proveedor" varchar(500)
+  "id_Presentacion_2" int [ref: > "dbo"."Presentacion"."idPresentacion"]
+  "cantidadMinima" int [not null]
+  "id_EmpleadoAsociado" int [not null]
+}
+
+Table "dbo"."CategoriaProducto" {
+  "idCategoriaProducto" int [pk, not null]
+  "nombre" varchar(500) [not null]
+  "descripcion" varchar(500) [not null]
+  "id_Asociado" int [not null]
+  "fechaCreada" datetime [not null]
+  "fechaModificada" datetime
+  "fechaEliminada" datetime
+  "estado" bit [not null]
+}
+
+Table "dbo"."Presentacion" {
+  "idPresentacion" int [pk, not null]
+  "nombre" varchar(500) [not null]
+  "id_Asociado" int [not null]
+  "estado" bit [not null]
+}
+
+Table "dbo"."MoviminetoProducto" {
+  "idMovimineto" int [pk, not null]
+  "id_Producto" int [not null, ref: > "dbo"."Producto"."idProducto"]
+  "id_ClaseMovimiento" int [not null, ref: > "dbo"."ClaseMovimineto"."idClaseMovimiento"]
+  "cantidad" int [not null]
+  "stockAnterior" int [not null]
+  "stockNuevo" int [not null]
+  "id_MotivoMovimiento" int [not null, ref: > "dbo"."MotivoMovimiento"."idMotivoMovimineto"]
+  "fechaCreacion" datetime
+  "fechaModificacion" datetime
+  "fechaEliminacion" datetime
+  "id_EmpladoAsociado" int [not null]
+  "id_Asociado" int [not null]
+}
+
+Table "dbo"."ClaseMovimineto" {
+  "idClaseMovimiento" int [pk, not null]
+  "descripcion" varchar(500)
+}
+
+Table "dbo"."MotivoMovimiento" {
+  "idMotivoMovimineto" int [pk, not null]
+  "descripcion" int [not null]
 }
