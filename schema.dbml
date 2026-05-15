@@ -452,3 +452,4 @@ Table "dbo"."VentaDetalle" {
   "precioUnitario" decimal
   "subtotal" decimal
 }
+
